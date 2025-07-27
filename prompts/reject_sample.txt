@@ -1,0 +1,2 @@
+Given the following background objects: {background_objects}, can you determine the presence of the following target objects: {target_objects}, with relying on textual priors, common sense knowledge, or general assumptions about object co-occurrences?
+Please respond with yes or no.
