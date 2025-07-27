@@ -1,2 +1,2 @@
 # ORIC
-Evaluate LVLMs’ robustness to context-incongruent object recognition and hallucination errors.
+This repo provides the source code & data of our paper: 
