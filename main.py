@@ -7,7 +7,7 @@ from pycocotools.coco import COCO
 from transformers import CLIPModel, CLIPProcessor
 import torch
 
-from utils.oric import ORIC
+from utils.oric import ORIC, DecodingArguments
 
 
 def parse_args():
@@ -63,6 +63,7 @@ def main(args):
     # Build file paths
     sampled_images_path = os.path.join(args.output_folder, "sampled_images.json")
     sim_pairs_path = os.path.join(args.output_folder, "similar_pairs.json")
+    sample_sim_path = os.path.join(args.output_folder, "sampled_similar_images_pairs.json")
     embeddings_path = os.path.join(args.output_folder, "embeddings.pt")
     questions_path = os.path.join(args.output_folder, "oric_questions.json")
 
@@ -96,16 +97,21 @@ def main(args):
         with open(sampled_images_path, "w") as f:
             json.dump(sampled_images, f, indent=4)
 
-    # Find similar pairs (this method itself caches to JSON)
-    sim_pairs = oric.extract_similar_images(
-        sampled=sampled_images,
-        embedding_path=embeddings_path,
-        output_path=sim_pairs_path,
-        batch_size=256,
-    )
+    if os.path.exists(sample_sim_path):
+        with open(sample_sim_path) as f:
+            sim_pairs = json.load(f)
+    else:
+        # Find similar pairs (this method itself caches to JSON)
+        sim_pairs = oric.extract_similar_images(
+            sampled=sampled_images,
+            embedding_path=embeddings_path,
+            output_path=sim_pairs_path,
+            batch_size=256,
+        )
 
     # Reproducible sampling of pairs
     random.seed(args.seed)
+    np.random.seed(42)
     if len(sim_pairs) > args.num_images:
         sim_pairs = random.sample(sim_pairs, args.num_images)
 

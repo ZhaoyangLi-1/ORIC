@@ -1,20 +1,23 @@
 from typing import Optional, Sequence
+from dataclasses import dataclass
+from openai import OpenAI
+import os
 
-
+@dataclass
 class DecodingArguments(object):
     # the same as the openai API: https://platform.openai.com/docs/api-reference/chat/create
     # Use OpenAI manner max_tokens mean the max_new_tokens in transformers!
     #  mu[j] -> mu[j] - c[j] * alpha_frequency - float(c[j] > 0) * alpha_presence
-    model: str = None
-    frequency_penalty: float = 0.0  # [-2, 2]
-    logit_bias: Optional[float] = None  # [-100, 100]
-    logprobs: Optional[int] = None  # [0, 5]
-    max_tokens: Optional[int] = None
+    model: str = "gpt-4"
+    frequency_penalty: float = 0.0
+    logit_bias: Optional[dict] = None
+    logprobs: Optional[int] = None
+    max_tokens: Optional[int] = 512
     n: int = 1
-    presence_penalty: float = 0.0  # [-2, 2]
+    presence_penalty: float = 0.0
     seed: Optional[int] = None
-    stop: Optional[Sequence[str]] = None  # Up to 4 sequences
-    temperature: float = 1.0  # [0, 2]
+    stop: Optional[Sequence[str]] = None
+    temperature: float = 1.0
     top_p: float = 1.0
     stream: bool = False
     tools: Optional[Sequence[str]] = None
@@ -23,24 +26,16 @@ class DecodingArguments(object):
 
 
 class Chatbot:
-
     def __init__(
         self,
         api_key: str = None,
         decoding_args: DecodingArguments = None,
     ):
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
-
-        assert self.api_key, (
-            "API key must be provided via the api_key argument "
-            "or the OPENAI_API_KEY environment variable."
-        )
-        
         if not self.api_key:
-            raise ValueError(
-                "API key must be provided via argument or OPENAI_API_KEY environment variable."
-            )
-        openai.api_key = self.api_key
+            raise ValueError("API key must be provided via argument or OPENAI_API_KEY environment variable.")
+
+        self.client = OpenAI(api_key=self.api_key)
 
         if decoding_args is None:
             decoding_args = DecodingArguments()
@@ -52,7 +47,7 @@ class Chatbot:
         )
 
     def send(self, messages: list[dict]) -> str:
-        response = openai.ChatCompletion.create(
+        response = self.client.chat.completions.create(
             model=self.decoding_args.model,
             messages=messages,
             temperature=self.decoding_args.temperature,
@@ -63,7 +58,7 @@ class Chatbot:
             presence_penalty=self.decoding_args.presence_penalty,
             frequency_penalty=self.decoding_args.frequency_penalty,
         )
-        return response.choices[0].message["content"]
+        return response.choices[0].message.content
 
     def ask(self, user_prompt: str, system_prompt: str = None) -> str:
         prompt = system_prompt or self.system_prompt
@@ -72,6 +67,7 @@ class Chatbot:
             {"role": "user", "content": user_prompt},
         ]
         return self.send(conversation)
+
 
 if __name__ == "__main__":
     args = DecodingArguments(

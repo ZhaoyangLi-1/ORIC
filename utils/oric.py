@@ -13,7 +13,7 @@ from shapely.ops import unary_union
 from pycocotools.coco import COCO
 from transformers import CLIPModel, CLIPProcessor
 
-from chatbot import Chatbot, DecodingArguments
+from utils.chatbot import Chatbot, DecodingArguments
 
 
 class ORIC:
@@ -45,7 +45,8 @@ class ORIC:
             self.reject_template = f.read()
 
         # initialize ChatBot once
-        self.chatbot = ChatBot(decoding_args)
+        api_key = os.getenv("OPENAI_API_KEY")
+        self.chatbot = Chatbot(api_key=api_key, decoding_args=decoding_args)
 
     # -------------------------
     #  Sampling COCO images
@@ -197,7 +198,6 @@ class ORIC:
     # ---------------------------------------
     # Positive Q&A via area & reject prompt
     # ---------------------------------------
-
     @staticmethod
     def _union_area(bboxes: List[List[float]]) -> float:
         # Union area of multiple [x,y,w,h] boxes.
@@ -247,9 +247,7 @@ class ORIC:
             prompt = self.reject_template.format(
                 background_objects=f"[{','.join(bg)}]", target_objects=obj
             )
-            resp = self.chatbot.call_model(
-                {"text": prompt}, self.decoding_args, return_list=False
-            ).lower()
+            resp = self.chatbot.ask(prompt).lower()
             if "no" in resp:
                 final.append(obj)
             if len(final) >= num_targets:
@@ -270,7 +268,6 @@ class ORIC:
     # ----------------------------------------
     # Negative Q&A via CLIP text‑image score
     # ----------------------------------------
-
     def construct_negative_questions(
         self,
         all_objects: Set[str],
@@ -278,7 +275,7 @@ class ORIC:
         sim_anns: List[Dict],
         num_targets: int,
         chunk_size: int = 100,
-    ) -> Dict[str, Dict]:
+    ) -> Dict[str, Dict[str, List[str]]]:
         existed = {a["category_name"] for a in sim_anns}
         candidates = list(all_objects - existed)
 
@@ -302,22 +299,20 @@ class ORIC:
 
         arr = np.array(scores)
         idx = np.argsort(arr)[:num_targets]
-        top20 = {candidates[i]: float(arr[i]) for i in np.argsort(arr)[:20]}
 
-        neg_qs: Dict[str, Dict] = {}
+        neg_qs: Dict[str, Dict[str, List[str]]] = {}
         for i in idx:
             obj = candidates[i]
             texts = [
                 t.format(object=obj if obj[0] not in "aeiouAEIOU" else f"an {obj}")
                 for t in self.QUESTION_TEMPLATE
             ]
-            neg_qs[obj] = {"clip_score": float(arr[i]), "text": texts}
+            neg_qs[obj] = {"text": texts}
         return neg_qs
 
     # ---------------------------
     # 5. Assemble final Q&A list
     # ---------------------------
-
     def extract_QA(
         self, sim_pairs: List[Dict], num_targets: int = 3, max_images: int = 750
     ) -> List[Dict]:
@@ -349,8 +344,6 @@ class ORIC:
                     skip = True
                     break
             for obj in neg:
-                if obj == "top_20_similar_objects":
-                    continue
                 if (sim, obj, "no") in seen:
                     skip = True
                     break
@@ -374,8 +367,6 @@ class ORIC:
 
             # emit negatives
             for obj, item in neg.items():
-                if obj == "top_20_similar_objects":
-                    continue
                 seen.add((sim, obj, "no"))
                 out.append(
                     {
@@ -385,10 +376,9 @@ class ORIC:
                         "target_object": obj,
                         "question": item["text"],
                         "label": "no",
-                        "clip_score": item["clip_score"],
-                        "top_20_similar_objects": neg["top_20_similar_objects"],
                     }
                 )
                 qid += 1
 
         return out
+
