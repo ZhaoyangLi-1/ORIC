@@ -8,7 +8,6 @@ from transformers import CLIPModel, CLIPProcessor
 import torch
 
 from utils.oric import ORIC
-from 
 
 
 def parse_args():
@@ -16,7 +15,7 @@ def parse_args():
     parser.add_argument(
         "--data_folder",
         type=str,
-        default = "/ariesdv0/zhaoyang/dataset",
+        default="/ariesdv0/zhaoyang/dataset",
         # default="./dataset",
         help="Root folder containing COCO data; expects 'instances_val2014.json' under data_folder/coco.",
     )
@@ -72,6 +71,10 @@ def main(args):
     coco = COCO(os.path.join(args.data_folder, "coco", "instances_val2014.json"))
     model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
     processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+    # Initialize GPT arguments
+    decoding_args = DecodingArguments(
+        model="gpt-4o-2024-08-06", max_tokens=512, image_detail="auto", temperature=0, top_p=1.0
+    )
 
     # Initialize ORIC helper
     oric = ORIC(
@@ -81,6 +84,7 @@ def main(args):
         device,
         image_folder=os.path.join(args.data_folder, "coco", "val2014"),
         reject_prompt_template=args.reject_prompt,
+        decoding_args=decoding_args
     )
 
     # Sample images (cache to JSON)

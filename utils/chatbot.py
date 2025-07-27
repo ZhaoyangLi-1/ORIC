@@ -1,7 +1,6 @@
-import os
-import openai
+from typing import Optional, Sequence
 
-@dataclasses.dataclass
+
 class DecodingArguments(object):
     # the same as the openai API: https://platform.openai.com/docs/api-reference/chat/create
     # Use OpenAI manner max_tokens mean the max_new_tokens in transformers!
