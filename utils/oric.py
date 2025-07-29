@@ -11,7 +11,6 @@ from tqdm import tqdm
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
 from pycocotools.coco import COCO
-from transformers import CLIPModel, CLIPProcessor
 
 from utils.chatbot import Chatbot, DecodingArguments
 
@@ -40,17 +39,12 @@ class ORIC:
         self.device = device
         self.image_folder = image_folder
 
-        # load reject‑prompt template
         with open(reject_prompt_template, "r") as f:
             self.reject_template = f.read()
 
-        # initialize ChatBot once
         api_key = os.getenv("OPENAI_API_KEY")
         self.chatbot = Chatbot(api_key=api_key, decoding_args=decoding_args)
 
-    # -------------------------
-    #  Sampling COCO images
-    # -------------------------
 
     def extract_images(self, min_num_objects: int = 2) -> List[Dict]:
         ids = self.coco.getImgIds()
@@ -74,10 +68,6 @@ class ORIC:
                 }
             )
         return sampled
-
-    # ----------------------------------------
-    #  CLIP embeddings & similarity lookup
-    # ----------------------------------------
 
     def precompute_embeddings(
         self, embedding_path: str, batch_size: int = 1000
@@ -112,10 +102,6 @@ class ORIC:
         embeddings = torch.cat(all_embs, dim=0)
         torch.save({"embeddings": embeddings, "image_ids": all_ids}, embedding_path)
         return embeddings, all_ids
-
-    # ----------------------------------------
-    #  Extract similar images
-    # ----------------------------------------
 
     def extract_similar_images(
         self,
@@ -195,9 +181,6 @@ class ORIC:
 
         return list(prog.values())
 
-    # ---------------------------------------
-    # Positive Q&A via area & reject prompt
-    # ---------------------------------------
     @staticmethod
     def _union_area(bboxes: List[List[float]]) -> float:
         # Union area of multiple [x,y,w,h] boxes.
@@ -265,9 +248,6 @@ class ORIC:
             pos_qs[obj] = {"text": texts}
         return pos_qs
 
-    # ----------------------------------------
-    # Negative Q&A via CLIP text‑image score
-    # ----------------------------------------
     def construct_negative_questions(
         self,
         all_objects: Set[str],
@@ -298,7 +278,7 @@ class ORIC:
             scores.extend(probs.tolist())
 
         arr = np.array(scores)
-        idx = np.argsort(arr)[:num_targets]
+        idx = np.argsort(arr)[::-1][:num_targets]
 
         neg_qs: Dict[str, Dict[str, List[str]]] = {}
         for i in idx:
@@ -310,9 +290,6 @@ class ORIC:
             neg_qs[obj] = {"text": texts}
         return neg_qs
 
-    # ---------------------------
-    # 5. Assemble final Q&A list
-    # ---------------------------
     def extract_QA(
         self, sim_pairs: List[Dict], num_targets: int = 3, max_images: int = 750
     ) -> List[Dict]:

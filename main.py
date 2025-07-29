@@ -6,6 +6,7 @@ import argparse
 from pycocotools.coco import COCO
 from transformers import CLIPModel, CLIPProcessor
 import torch
+import numpy as np
 
 from utils.oric import ORIC, DecodingArguments
 
@@ -15,15 +16,13 @@ def parse_args():
     parser.add_argument(
         "--data_folder",
         type=str,
-        default="/ariesdv0/zhaoyang/dataset",
-        # default="./dataset",
+        default="./dataset",
         help="Root folder containing COCO data; expects 'instances_val2014.json' under data_folder/coco.",
     )
     parser.add_argument(
         "--output_folder",
         type=str,
-        # default="./outputs",
-        default="/ariesdv0/zhaoyang/ORIC/outputs",
+        default="./outputs",
         help="Directory to save cached files and final Q&A.",
     )
     parser.add_argument(

@@ -67,21 +67,3 @@ class Chatbot:
             {"role": "user", "content": user_prompt},
         ]
         return self.send(conversation)
-
-
-if __name__ == "__main__":
-    args = DecodingArguments(
-        model="gpt-3.5-turbo",
-        temperature=0.5,
-        max_tokens=256,
-        top_p=1.0,
-        n=1,
-        stop=None,
-        presence_penalty=0.0,
-        frequency_penalty=0.0
-    )
-    bot = Chatbot(decoding_args=args)
-    my_prompt = "Write a short poem about spring."
-    reply = bot.ask(user_prompt=my_prompt)
-    print("Assistant response:")
-    print(reply)
