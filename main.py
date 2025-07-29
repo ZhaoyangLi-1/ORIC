@@ -68,7 +68,7 @@ def main(args):
 
     # Initialize COCO and CLIP
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    coco = COCO(os.path.join(args.data_folder, "coco", "instances_val2014.json"))
+    coco = COCO(os.path.join(args.data_folder, "instances_val2014.json"))
     model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
     processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
     # Initialize GPT arguments
