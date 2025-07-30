@@ -3,6 +3,7 @@ This repo provides the source code & data of our paper: ORIC: Benchmarking Objec
 
 
 ## 1. Installation Dependencies:
+```bash
 pip install -r requirements.txt
 
 ## 2. Set your OpenAI API Key:
@@ -39,14 +40,17 @@ This step produces ORIC-style Q&A pairs ready for inference. We already provide 
 
 Run your Vision-Language Model (VLM) on the generated ORIC Q&A pairs. The output should be saved in a JSON file with the following structure:
 
+```json
 [
   {
     "question_id": "000001",
-    "answer": "yes"
+    "predicted_answer": "yes",
+    "label": "yes"
   },
   {
     "question_id": "000002",
-    "answer": "no"
+    "predicted_answer": "no",
+    "label": "no"
   }
 ]
 
