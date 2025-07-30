@@ -8,9 +8,12 @@ pip install -r requirements.txt
 ```
 
 ## 2. Set your OpenAI API Key:
+```bash
 export OPENAI_API_KEY="your_openai_api_key"
+```
 
 ## 3. Generate ORIC QA Samples:
+```bash
 python main.py \
   --data_folder /path/to/coco \
   --output_folder /path/to/output \
@@ -19,6 +22,7 @@ python main.py \
   --seed 42 \
   --llm_model gpt-4o-2024-08-06 \
   --reject_prompt ./prompts/reject_sample.txt
+```
 
 Arguments:
 
@@ -57,7 +61,8 @@ Run your Vision-Language Model (VLM) on the generated ORIC Q&A pairs. The output
 ```
 
 ## 5. Evaluate Model Performance：
+```bash
 python evaluate.py \
   --result_path /path/to/predictions.json \
   --output_folder /path/to/eval_results
-
+```
