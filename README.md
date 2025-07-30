@@ -5,6 +5,7 @@ This repo provides the source code & data of our paper: ORIC: Benchmarking Objec
 ## 1. Installation Dependencies:
 ```bash
 pip install -r requirements.txt
+```
 
 ## 2. Set your OpenAI API Key:
 export OPENAI_API_KEY="your_openai_api_key"
@@ -53,6 +54,7 @@ Run your Vision-Language Model (VLM) on the generated ORIC Q&A pairs. The output
     "label": "no"
   }
 ]
+```
 
 ## 5. Evaluate Model Performance：
 python evaluate.py \
