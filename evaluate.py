@@ -61,7 +61,7 @@ def save_results(results, output_folder):
 def parse_args():
     parser = argparse.ArgumentParser(description="Evaluate binary classification results from JSON file.")
     parser.add_argument(
-        "--input_json",
+        "--result_path",
         type=str,
         required=True,
         help="Path to the input JSON file containing predictions.",
