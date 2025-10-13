@@ -1,5 +1,5 @@
 # ORIC
-This repo provides the source code & data of our paper: ORIC: Benchmarking Object Recognition in Incongruous Context for Large Vision-Language Models
+[**ORIC: Benchmarking Object Recognition in Incongruous Context for Large Vision-Language Models**](https://arxiv.org/abs/2509.15695) 
 
 
 ## 1. Installation Dependencies:
