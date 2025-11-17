@@ -1,27 +1,11 @@
 # ORIC: Benchmarking Object Recognition in Incongruous Context for Large Vision-Language Models
 This repo provides the source code & data of our paper: [**ORIC: Benchmarking Object Recognition in Incongruous Context for Large Vision-Language Models**](https://arxiv.org/abs/2509.15695) by
 
-## Authors
-
-**Zhaoyang Li\*** · UC San Diego  
-[Homepage](https://zhaoyangli-1.github.io/)
-
-**Zhang Ling\*** · UC San Diego  
-[Homepage](https://lz1oceani.github.io/)
-
-**Yuchen Zhou** · UC San Diego  
-[Homepage](https://www.yuchenzhou.org/)
-
-**Litian Gong** · UC Riverside  
-[Homepage](https://gonglitian.github.io/)
-
-**Erdem Bıyık** · University of Southern California  
-[Homepage](https://ebiyik.github.io/)
-
-**Hao Su** · UC San Diego  
-[Homepage](https://cseweb.ucsd.edu/~haosu)
+**Authors:**  
+[Zhaoyang Li](https://zhaoyangli-1.github.io/)\* (UC San Diego), [Zhang Ling](https://lz1oceani.github.io/)\* (UC San Diego), [Yuchen Zhou](https://www.yuchenzhou.org/) (UC San Diego), [Litian Gong](https://gonglitian.github.io/) (UC Riverside), [Erdem Bıyık](https://ebiyik.github.io/) (University of Southern California), [Hao Su](https://cseweb.ucsd.edu/~haosu) (UC San Diego)  
 
 \* Equal contribution.
+
 
 ![ORIC Overview](./figures/oric.png)
 
