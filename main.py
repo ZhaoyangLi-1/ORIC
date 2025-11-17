@@ -83,7 +83,7 @@ def main(args):
     processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
     # Initialize GPT arguments
     decoding_args = DecodingArguments(
-        model="gpt-4o-2024-08-06", max_tokens=512, image_detail="auto", temperature=0, top_p=1.0
+        model=args.llm_model, max_tokens=1024, image_detail="auto", temperature=0, top_p=1.0
     )
 
     # Initialize ORIC helper
