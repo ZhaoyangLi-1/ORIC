@@ -26,8 +26,8 @@ Applied to MSCOCO, ORIC produces both **ORIC-Bench** (evaluation) and **ORIC-sty
 ```bash
 git clone https://github.com/ZhaoyangLi-1/ORIC.git
 cd ORIC
-conda create -n ORIC python=3.10
-conda activate ORIC
+conda create -n oric python=3.10
+conda activate oric
 bash setup.sh
 ```
 

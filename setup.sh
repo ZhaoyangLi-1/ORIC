@@ -26,7 +26,8 @@ pip uninstall -y torch torchvision torchaudio
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
 
 
-pip install -v flash-attn --no-build-isolation
+# pip install -v flash-attn --no-build-isolation
+pip install "flash-attn==2.7.4.post1" --no-build-isolation
 
 
 
