@@ -1,17 +1,30 @@
 # ORIC: Benchmarking Object Recognition under Contextual Incongruity in Large Vision-Language Models
 
-This repo provides the source code & data of our paper: [**ORIC: Benchmarking Object Recognition in Incongruous Context for Large Vision-Language Models**](https://arxiv.org/abs/2509.15695) by
+This repository provides the official implementation and data for  
+**ORIC: Benchmarking Object Recognition in Incongruous Context for Large Vision-Language Models**  
+[[arXiv](https://arxiv.org/abs/2509.15695)]
 
 [Zhaoyang Li](https://zhaoyangli-1.github.io/)\* (UC San Diego), [Zhang Ling](https://lz1oceani.github.io/)\* (UC San Diego), [Yuchen Zhou](https://www.yuchenzhou.org/) (UC San Diego), [Litian Gong](https://gonglitian.github.io/) (UC Riverside), [Erdem Bıyık](https://ebiyik.github.io/) (University of Southern California), [Hao Su](https://cseweb.ucsd.edu/~haosu) (UC San Diego, Hillbot)  
 
 \* Equal contribution.
 
+---
+
 ![ORIC Overview](./figures/oric.png)
+
+We **ORIC** is a framework designed to systematically evaluate object recognition under such **incongruous contexts**, where objects appear in unexpected contexts—or expected objects fail to appear. It constructs challenging object–context pairs via two complementary strategies:  
+
+(1) **LLM-guided sampling** to identify hard-to-recognize existing objects, and  
+(2) **CLIP-guided sampling** to mine plausible but absent ones.  
+
+Applied to MSCOCO, ORIC produces both **ORIC-Bench** (evaluation) and **ORIC-style training data**. We provde codes for both evaluation of the ORIC-Bench and fine-tuning Qwen3-VL-8B-Instruct with **Visual Reinforcement Fine-Tuning (Visual-RFT)**. Overall, ORIC highlights contextual incongruity as a key source of uncertainty in LVLMs and provides tools for developing more reliable vision-language systems.
+
+---
 
 
 ## 1. Setup:
 ```bash
-https://github.com/ZhaoyangLi-1/ORIC.git
+git clone https://github.com/ZhaoyangLi-1/ORIC.git
 cd ORIC
 conda create -n ORIC python=3.10
 conda activate ORIC
@@ -31,7 +44,7 @@ python main.py \
   --num_objects 3 \
   --num_images 1000 \
   --seed 42 \
-  --llm_model gpt-4o-2024-08-06 \
+  --llm_model gpt-5-2025-08-07 \
   --reject_prompt ./prompts/reject_sample.txt \
   --split val
 ```
@@ -46,13 +59,13 @@ Arguments:
 
 --num_images: Number of image pairs to use. The total number of Q&A pairs ≈ 2 × num_images × num_objects.
 
---llm_model: OpenAI model name (e.g., gpt-4o-2024-08-06).
+--llm_model: OpenAI model name (e.g., gpt-5-2025-08-07).
 
 --reject_prompt: Prompt template used to formulate questions.
 
 --split: Dataset split to use: `train` or `val`.  
-- `train`: generates ORIC-style training data  
-- `val`: generates ORIC-Bench evaluation data
+- `train`: Produces ORIC-style training data.
+- `val`: Produces ORIC-Bench evaluation data.
 
 
 This step produces ORIC-style Q&A pairs ready for inference. We already provide generated questions in the outputs folder for dirrectly using.
@@ -86,7 +99,7 @@ python evaluate.py \
 
 ## 6. Visual-RFT Finetuning
 
-This section describes how to fine-tune **Qwen3-VL-8B-Instruct** using **Visual-RFT**, our reinforcement-learning–based finetuning pipeline built upon **Group Relative Policy Optimization (GRPO)** for binary object-existence classification on ORIC-style data.
+Visual-RFT is our reinforcement-learning finetuning pipeline built upon Group Relative Policy Optimization (GRPO), designed to reduce uncertainty-driven hallucination and improve robustness under contextual incongruity.
 
 ### Requirements
 - 4 × NVIDIA H100 / A100 GPUs  
@@ -131,11 +144,8 @@ torchrun --nproc_per_node="4" \
 
 Arguments:
 
---output_dir ${SAVE_PATH}
-Directory where all finetuned model weights, logs, and checkpoints will be saved.
+--output_dir ${SAVE_PATH}: Directory where all finetuned model weights, logs, and checkpoints will be saved.
 
---model_name_or_path ${CKPT_PATH}
-Path to the pretrained base model (e.g., Qwen3-VL-8B-Instruct) used as the initialization for Visual-RFT.
+--model_name_or_path ${CKPT_PATH}: Path to the pretrained base model (e.g., Qwen3-VL-8B-Instruct) used as the initialization for Visual-RFT.
 
---dataset_name ${DATA_PATH}
-Path to the ORIC-style training dataset in JSON / HF Dataset format for GRPO finetuning.
+--dataset_name ${DATA_PATH}: Path to the ORIC-style training dataset in JSON / HF Dataset format for GRPO finetuning.
