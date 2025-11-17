@@ -94,6 +94,7 @@ def main(args):
         device,
         image_folder=os.path.join(args.data_folder, f"{split}2014"),
         reject_prompt_template=args.reject_prompt,
+        split=split,
         decoding_args=decoding_args
     )
 
@@ -128,6 +129,8 @@ def main(args):
     questions = oric.extract_QA(
         sim_pairs, num_targets=args.num_objects, max_images=args.num_images
     )
+    
+    
 
     # Save final questions
     with open(questions_path, "w") as f:

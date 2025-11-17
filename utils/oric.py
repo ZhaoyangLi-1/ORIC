@@ -22,7 +22,7 @@ class ORIC:
         "Have you noticed {object} in the image?",
         "Can you see {object} in the image?",
     ]
-
+    
     def __init__(
         self,
         coco,
@@ -31,6 +31,7 @@ class ORIC:
         device: torch,
         image_folder,
         reject_prompt_template,
+        split,
         decoding_args,
     ):
         self.coco = coco
@@ -38,6 +39,14 @@ class ORIC:
         self.processor = clip_processor
         self.device = device
         self.image_folder = image_folder
+        assert split in ["train", "val"], "Invalid split"
+        self.split = split
+        
+        self.train_question_template = (
+            "{question} Please first provide your reasoning or working out"
+            f" on how you would go about solving the question between <REASONING> and </REASONING>"
+            f" and then your final answer between <SOLUTION> and (put yes or no here) </SOLUTION>."
+        )
 
         with open(reject_prompt_template, "r") as f:
             self.reject_template = f.read()
@@ -245,6 +254,8 @@ class ORIC:
                 t.format(object=obj if obj[0] not in "aeiouAEIOU" else f"an {obj}")
                 for t in self.QUESTION_TEMPLATE
             ]
+            if self.split == "train":
+                texts = self.train_question_template.format(question=texts[0])
             pos_qs[obj] = {"text": texts}
         return pos_qs
 
@@ -287,75 +298,101 @@ class ORIC:
                 t.format(object=obj if obj[0] not in "aeiouAEIOU" else f"an {obj}")
                 for t in self.QUESTION_TEMPLATE
             ]
+            if self.split == "train":
+                texts = self.train_question_template.format(question=texts[0])
             neg_qs[obj] = {"text": texts}
         return neg_qs
 
     def extract_QA(
         self, sim_pairs: List[Dict], num_targets: int = 3, max_images: int = 750
     ) -> List[Dict]:
+        # All possible object names from COCO categories
         all_objs = {c["name"] for c in self.coco.dataset["categories"]}
+
+        # Track (image, object, label) triples to avoid duplicates
         seen: Set[Tuple[str, str, str]] = set()
-        out, qid = [], 1
+
+        out: List[Dict] = []
+        qid = 1
+
+        # Maximum number of QA pairs allowed
         limit = max_images * num_targets * 2
+
+        # Precompute formatted solutions for train/val
+        is_train = (self.split == "train")
+        yes_solution = "<SOLUTION>yes</SOLUTION>" if is_train else "yes"
+        no_solution  = "<SOLUTION>no</SOLUTION>"  if is_train else "no"
 
         for pair in tqdm(sim_pairs, desc="Building Q&A"):
             if qid > limit:
                 break
-            img, sim = pair["image_path"], pair["similar_images"]["image_path"]
-            w, h = pair["image_info"]["width"], pair["image_info"]["height"]
-            anns, sims = pair["annotations"], pair["similar_images"]["annotations"]
 
+            # Main image and its most similar image
+            img = pair["image_path"]
+            sim = pair["similar_images"]["image_path"]
+
+            # Basic info
+            w, h = pair["image_info"]["width"], pair["image_info"]["height"]
+            anns = pair["annotations"]
+            sims = pair["similar_images"]["annotations"]
+
+            # Construct positive questions from ROI objects
             pos = self.construct_positive_questions(
-                imgs_path := img, anns=anns, width=w, height=h, num_targets=num_targets
+                imgs_path=img, anns=anns, width=w, height=h, num_targets=num_targets
             )
             if not pos:
+                # Skip images with no valid ROI targets
                 continue
+
+            # Construct negative questions from similar-image objects
             neg = self.construct_negative_questions(
                 all_objs, sim, sims, num_targets=num_targets
             )
 
-            # skip duplicates
-            skip = False
-            for obj in pos:
-                if (img, obj, "yes") in seen:
-                    skip = True
-                    break
-            for obj in neg:
-                if (sim, obj, "no") in seen:
-                    skip = True
-                    break
-            if skip:
+            # Deduplication check: if any positive or negative has appeared before, skip this pair
+            has_dup_pos = any((img, obj, "yes") in seen for obj in pos)
+            has_dup_neg = any((sim, obj, "no")  in seen for obj in neg)
+            if has_dup_pos or has_dup_neg:
                 continue
 
-            # emit positives
+            # Emit positive samples
             for obj, item in pos.items():
+                if qid > limit:
+                    break
                 seen.add((img, obj, "yes"))
                 out.append(
                     {
                         "id": qid,
                         "image": img,
-                        "similar_image": sim,
+                        # "similar_image": sim,
                         "target_object": obj,
-                        "question": item["text"],
-                        "label": "yes",
+                        "problem": item["text"],
+                        "solution": yes_solution,
                     }
                 )
                 qid += 1
 
-            # emit negatives
+            # Emit negative samples
             for obj, item in neg.items():
+                if qid > limit:
+                    break
                 seen.add((sim, obj, "no"))
                 out.append(
                     {
                         "id": qid,
                         "image": sim,
-                        "similar_image": img,
+                        # "similar_image": img,
                         "target_object": obj,
-                        "question": item["text"],
-                        "label": "no",
+                        "problem": item["text"],
+                        "solution": no_solution,
                     }
                 )
                 qid += 1
 
+            if qid > limit:
+                break
+
         return out
 
+
+# "similar_image": img,
