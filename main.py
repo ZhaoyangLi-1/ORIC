@@ -22,7 +22,7 @@ def parse_args():
     parser.add_argument(
         "--output_folder",
         type=str,
-        default="./outputs",
+        default="./dataset",
         help="Directory to save cached files and final Q&A.",
     )
     parser.add_argument(
@@ -52,23 +52,33 @@ def parse_args():
         default="./prompts/reject_sample.txt",
         help="Path to the reject_sample prompt template.",
     )
+    parser.add_argument(
+        "--split",
+        type=str,
+        default="val",
+        choices=["train", "val"],
+        help="Dataset split to use: train or val.",
+    )
     return parser.parse_args()
 
 
 def main(args):
     # Prepare output folder
+    split = args.split
     os.makedirs(args.output_folder, exist_ok=True)
-
     # Build file paths
     sampled_images_path = os.path.join(args.output_folder, "sampled_images.json")
     sim_pairs_path = os.path.join(args.output_folder, "similar_pairs.json")
     sample_sim_path = os.path.join(args.output_folder, "sampled_similar_images_pairs.json")
     embeddings_path = os.path.join(args.output_folder, "embeddings.pt")
-    questions_path = os.path.join(args.output_folder, "oric_questions.json")
+    if "val" == split:
+        questions_path = os.path.join(args.output_folder, "oric_bench.json")
+    else:
+        questions_path = os.path.join(args.output_folder, "oric_train.json")
 
     # Initialize COCO and CLIP
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    coco = COCO(os.path.join(args.data_folder, "instances_val2014.json"))
+    coco = COCO(os.path.join(args.data_folder, f"instances_{split}2014.json"))
     model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
     processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
     # Initialize GPT arguments
@@ -82,7 +92,7 @@ def main(args):
         model,
         processor,
         device,
-        image_folder=os.path.join(args.data_folder, "coco", "val2014"),
+        image_folder=os.path.join(args.data_folder, f"{split}2014"),
         reject_prompt_template=args.reject_prompt,
         decoding_args=decoding_args
     )
