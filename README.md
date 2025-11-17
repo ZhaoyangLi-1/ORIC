@@ -10,9 +10,13 @@ This repo provides the source code & data of our paper: [**ORIC: Benchmarking Ob
 ![ORIC Overview](./figures/oric.png)
 
 
-## 1. Installation Dependencies:
+## 1. Setup:
 ```bash
-pip install -r requirements.txt
+https://github.com/ZhaoyangLi-1/ORIC.git
+cd ORIC
+conda create -n ORIC python=3.10
+conda activate ORIC
+bash setup.sh
 ```
 
 ## 2. Set your OpenAI API Key:
@@ -29,7 +33,8 @@ python main.py \
   --num_images 1000 \
   --seed 42 \
   --llm_model gpt-4o-2024-08-06 \
-  --reject_prompt ./prompts/reject_sample.txt
+  --reject_prompt ./prompts/reject_sample.txt \
+  --split val
 ```
 
 Arguments:
@@ -45,6 +50,11 @@ Arguments:
 --llm_model: OpenAI model name (e.g., gpt-4o-2024-08-06).
 
 --reject_prompt: Prompt template used to formulate questions.
+
+--split: Dataset split to use: `train` or `val`.  
+- `train`: generates ORIC-style training data  
+- `val`: generates ORIC-Bench evaluation data
+
 
 This step produces ORIC-style Q&A pairs ready for inference. We already provide generated questions in the outputs folder for dirrectly using.
 
