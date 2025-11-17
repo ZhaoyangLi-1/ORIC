@@ -109,7 +109,18 @@ Visual-RFT is our reinforcement-learning finetuning pipeline built upon Group Re
 
 ---
 
-### 6.1 Training Command
+### 6.1 Training Data Preprocessing
+
+Before running Visual-RFT finetuning, ORIC-style training data must be converted into a **HuggingFace Dataset** format.   Use the following preprocessing script to convert an ORIC JSON file into a HF `DatasetDict`:
+
+```bash
+python virft/dataset/build_dataset.py \
+  --json_path /path/to/oric_train.json \
+  --image_dir /path/to/coco/images \
+  --save_path /path/to/hf_datase
+```
+
+### 6.2 Training Command
 
 Run the following command to launch GRPO fine-tuning on 4 GPUs:
 
