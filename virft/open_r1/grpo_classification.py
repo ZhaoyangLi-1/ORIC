@@ -13,13 +13,19 @@
 # limitations under the License.
 
 import os
+import sys
+# CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+# VIRFT_DIR = os.path.dirname(CURRENT_DIR) 
+# if VIRFT_DIR not in sys.path:
+#     sys.path.insert(0, VIRFT_DIR)
+
 import re
 from datetime import datetime
 from dataclasses import dataclass, field
 from typing import Optional
 
 from math_verify import parse, verify
-from open_r1.trainer import Qwen3VLGRPOTrainer, Qwen3VLGRPOVLLMTrainer
+from virft.open_r1.trainer import Qwen3VLGRPOTrainer, Qwen3VLGRPOVLLMTrainer
 from trl import GRPOConfig, GRPOTrainer, ModelConfig, ScriptArguments, TrlParser, get_peft_config
 
 import json
@@ -173,7 +179,7 @@ def main(script_args, training_args, model_args):
         dataset = dataset.remove_columns("messages")
 
     
-    trainer_cls = Qwen2VLGRPOTrainer if not training_args.use_vllm else Qwen2VLGRPOVLLMTrainer
+    trainer_cls = Qwen3VLGRPOTrainer if not training_args.use_vllm else Qwen3VLGRPOVLLMTrainer
     print("using: ", trainer_cls)
 
 
