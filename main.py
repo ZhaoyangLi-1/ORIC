@@ -43,7 +43,7 @@ def parse_args():
     parser.add_argument(
         "--llm_model",
         type=str,
-        default="gpt-4o-2024-08-06",
+        default="gpt-5-2025-08-07",
         help="Model to do LLM-guided sampling",
     )
     parser.add_argument(
