@@ -69,28 +69,17 @@ data_folder/
 
 --num_objects: Number of objects to sample per image.
 
---num_images: Number of images **per label** (i.e., per *yes* or *no* class).  
-For example, if `num_images = 500`, the sampler uses:
+--num_images: Number of images **per label** (`yes` and `no`).
+  For example, if `num_images = 500`, the sampler uses:
+  - 500 images with label **yes**
+  - 500 images with label **no**
+  - Given `num_objects`, the total number of Q&A pairs is:
 
-- 500 images for **label = yes**
-- 500 images for **label = no**
+    `Total Q&A = 2 * num_images * num_objects`
 
-Given `num_objects`, the total number of Q&A pairs is:
+    For instance, if `num_images = 500` and `num_objects = 2`, then:
 
-\[
-\text{Total Q\&A} = 2 \times \text{num\_images} \times \text{num\_objects}.
-\]
-
-For instance, if `num_images = 500` and `num_objects = 2`, then:
-
-\[
-2 \times 500 \times 2 = 2000 \text{ Q\&A pairs}.
-\]
-
-Here:
-- the first **2** corresponds to the two labels (*yes* / *no*),
-- `num_images` is the number of images for each label,
-- `num_objects` is the number of objects queried per image.
+    `Total Q&A = 2 * 500 * 2 = 2000` Q&A pairs.
 
 
 --llm_model: OpenAI model name (e.g., gpt-5-2025-08-07).
