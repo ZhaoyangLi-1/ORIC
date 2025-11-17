@@ -26,39 +26,42 @@ class DecodingArguments(object):
 
 
 class Chatbot:
-    def __init__(
-        self,
-        api_key: str = None,
-        decoding_args: DecodingArguments = None,
-    ):
+    def __init__(self, api_key: str = None, decoding_args: DecodingArguments = None):
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         if not self.api_key:
-            raise ValueError("API key must be provided via argument or OPENAI_API_KEY environment variable.")
+            raise ValueError("API key must be provided.")
 
         self.client = OpenAI(api_key=self.api_key)
+        self.model = self.client
+        self.model_name = decoding_args.model if decoding_args else "gpt-4"
 
-        if decoding_args is None:
-            decoding_args = DecodingArguments()
-        self.decoding_args = decoding_args
-
+        self.decoding_args = decoding_args or DecodingArguments()
         self.system_prompt = (
-            "You are a helpful, friendly AI assistant. Provide clear, concise answers "
-            "and ask follow-up questions only when needed for clarity."
+            "You are a helpful, friendly AI assistant."
         )
+
+    def _call_gpt_5_text_only(self, prompt: str):
+        resp = self.model.responses.create(
+            model=self.model_name,
+            input=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "input_text", "text": prompt},
+                    ],
+                }
+            ],
+            max_output_tokens=self.decoding_args.max_tokens,
+        )
+        return resp.output_text 
 
     def send(self, messages: list[dict]) -> str:
-        response = self.client.chat.completions.create(
-            model=self.decoding_args.model,
-            messages=messages,
-            temperature=self.decoding_args.temperature,
-            max_tokens=self.decoding_args.max_tokens,
-            top_p=self.decoding_args.top_p,
-            n=self.decoding_args.n,
-            stop=self.decoding_args.stop,
-            presence_penalty=self.decoding_args.presence_penalty,
-            frequency_penalty=self.decoding_args.frequency_penalty,
-        )
-        return response.choices[0].message.content
+        user_prompt = ""
+        for msg in messages:
+            if msg["role"] == "user":
+                user_prompt = msg["content"]
+
+        return self._call_gpt_5_text_only(user_prompt)
 
     def ask(self, user_prompt: str, system_prompt: str = None) -> str:
         prompt = system_prompt or self.system_prompt

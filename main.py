@@ -17,7 +17,7 @@ def parse_args():
         "--data_folder",
         type=str,
         default="./dataset",
-        help="Root folder containing COCO data; expects 'instances_val2014.json' under data_folder/coco.",
+        help="Root folder containing COCO data.",
     )
     parser.add_argument(
         "--output_folder",
@@ -67,10 +67,10 @@ def main(args):
     split = args.split
     os.makedirs(args.output_folder, exist_ok=True)
     # Build file paths
-    sampled_images_path = os.path.join(args.output_folder, "sampled_images.json")
-    sim_pairs_path = os.path.join(args.output_folder, "similar_pairs.json")
-    sample_sim_path = os.path.join(args.output_folder, "sampled_similar_images_pairs.json")
-    embeddings_path = os.path.join(args.output_folder, "embeddings.pt")
+    sampled_images_path = os.path.join(args.output_folder, f"{split}_sampled_images.json")
+    sim_pairs_path = os.path.join(args.output_folder, f"{split}_similar_pairs.json")
+    sample_sim_path = os.path.join(args.output_folder, f"{split}_sampled_similar_images_pairs.json")
+    embeddings_path = os.path.join(args.output_folder, f"{split}_embeddings.pt")
     if "val" == split:
         questions_path = os.path.join(args.output_folder, "oric_bench.json")
     else:
@@ -78,7 +78,7 @@ def main(args):
 
     # Initialize COCO and CLIP
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    coco = COCO(os.path.join(args.data_folder, f"instances_{split}2014.json"))
+    coco = COCO(os.path.join(args.data_folder, "annotations", f"instances_{split}2014.json"))
     model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
     processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
     # Initialize GPT arguments

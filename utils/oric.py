@@ -31,9 +31,9 @@ class ORIC:
         self.model = clip_model.to(device)
         self.processor = clip_processor
         self.device = device
-        self.image_folder = image_folder
         assert split in ["train", "val"], "Invalid split"
         self.split = split
+        self.image_folder = image_folder
         
         self.basic_question_template = [
             "Is there {object} in the image?",
@@ -338,7 +338,7 @@ class ORIC:
 
             # Construct positive questions from ROI objects
             pos = self.construct_positive_questions(
-                imgs_path=img, anns=anns, width=w, height=h, num_targets=num_targets
+                image_path=img, anns=anns, width=w, height=h, num_targets=num_targets
             )
             if not pos:
                 # Skip images with no valid ROI targets

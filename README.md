@@ -1,8 +1,7 @@
 # ORIC: Benchmarking Object Recognition under Contextual Incongruity in Large Vision-Language Models
 
 This repository provides the official implementation and data for  
-**ORIC: Benchmarking Object Recognition in Incongruous Context for Large Vision-Language Models**  
-[[arXiv](https://arxiv.org/abs/2509.15695)]
+[**ORIC: Benchmarking Object Recognition in Incongruous Context for Large Vision-Language Models**](https://arxiv.org/abs/2509.15695)
 
 [Zhaoyang Li](https://zhaoyangli-1.github.io/)\* (UC San Diego), [Zhang Ling](https://lz1oceani.github.io/)\* (UC San Diego), [Yuchen Zhou](https://www.yuchenzhou.org/) (UC San Diego), [Litian Gong](https://gonglitian.github.io/) (UC Riverside), [Erdem Bıyık](https://ebiyik.github.io/) (University of Southern California), [Hao Su](https://cseweb.ucsd.edu/~haosu) (UC San Diego, Hillbot)  
 
@@ -41,7 +40,7 @@ export OPENAI_API_KEY="your_openai_api_key"
 python main.py \
   --data_folder /path/to/coco \
   --output_folder /path/to/output \
-  --num_objects 3 \
+  --num_objects 2 \
   --num_images 1000 \
   --seed 42 \
   --llm_model gpt-5-2025-08-07 \
@@ -52,6 +51,19 @@ python main.py \
 Arguments:
 
 --data_folder: Path to your COCO dataset folder.
+
+```text
+data_folder/
+├── train2014/                 # Training images
+│     ├── COCO_train2014_000000000009.jpg
+│     └── ...
+├── val2014/                   # Validation images
+│     ├── COCO_val2014_000000000042.jpg
+│     └── ...
+└── annotations/               # COCO annotation JSON files
+      ├── instances_train2014.json
+      └── instances_val2014.json
+```
 
 --output_folder: Directory to save generated Q&A samples.
 
