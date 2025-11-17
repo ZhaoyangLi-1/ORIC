@@ -128,7 +128,7 @@ Run the following command to launch GRPO fine-tuning on 4 GPUs:
 export DEBUG_MODE="true"
 export LOG_PATH="./debug_log_8b_GRPO_oric.txt"
 
-export DATA_PATH=./dataset  ### ORIC-style training data path
+export DATA_PATH=./dataset  ### ORIC-style training data path which was saved in Section 6.1
 export CKPT_PATH=./share_models/Qwen3-VL-8B-Instruct ### Qwen3-VL-8B-Instruct checkpoint path
 export SAVE_PATH=./share_models/Qwen3-VL-8B-Instruct_GRPO_oric ### save path
 
