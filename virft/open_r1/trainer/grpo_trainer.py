@@ -96,7 +96,7 @@ class Qwen3VLGRPOTrainer(Trainer):
         # self.clip_range = float(getattr(args, "clip_range", 0.12))
 
         # >>> MOD: decide dtype from args and enforce for FA2
-        desired_dtype = model_init_kwargs.get("torch_dtype", None)
+        desired_dtype = model_init_kwargs.get("dtype", None)
         if not isinstance(desired_dtype, torch.dtype):
             if getattr(args, "bf16", False) and torch.cuda.is_bf16_supported():
                 desired_dtype = torch.bfloat16
@@ -105,7 +105,7 @@ class Qwen3VLGRPOTrainer(Trainer):
             else:
                 desired_dtype = None
             if desired_dtype is not None:
-                model_init_kwargs["torch_dtype"] = desired_dtype
+                model_init_kwargs["dtype"] = desired_dtype
 
         model_init_kwargs.setdefault("low_cpu_mem_usage", True)
         model_init_kwargs.setdefault("device_map", None)
@@ -113,10 +113,10 @@ class Qwen3VLGRPOTrainer(Trainer):
         if args.gradient_checkpointing:
             model_init_kwargs["use_cache"] = False
 
-        if attn_implementation == "flash_attention_2" and model_init_kwargs.get("torch_dtype") is None:
+        if attn_implementation == "flash_attention_2" and model_init_kwargs.get("dtype") is None:
             raise ValueError(
                 "flash_attention_2 requires half precision. Enable --bf16 (preferred on A100/H100) "
-                "or --fp16, or set model_init_kwargs['torch_dtype'] to torch.bfloat16/torch.float16."
+                "or --fp16, or set model_init_kwargs['dtype'] to torch.bfloat16/torch.float16."
             )
         # <<< MOD END
 
@@ -126,16 +126,16 @@ class Qwen3VLGRPOTrainer(Trainer):
             model_id_lower = model_id.lower()
             model_basename = model_id.rstrip("/").split("/")[-1].lower()
 
-            torch_dtype = model_init_kwargs.get("torch_dtype")
-            if isinstance(torch_dtype, torch.dtype) or torch_dtype == "auto" or torch_dtype is None:
+            dtype = model_init_kwargs.get("dtype")
+            if isinstance(dtype, torch.dtype) or dtype == "auto" or dtype is None:
                 pass
-            elif isinstance(torch_dtype, str):
-                torch_dtype = getattr(torch, torch_dtype)
-                model_init_kwargs["torch_dtype"] = torch_dtype
+            elif isinstance(dtype, str):
+                dtype = getattr(torch, dtype)
+                model_init_kwargs["dtype"] = dtype
             else:
                 raise ValueError(
-                    "Invalid `torch_dtype` passed to `GRPOConfig`. Expected either 'auto' or a string representing "
-                    f"a `torch.dtype` (e.g., 'float32'), but got {torch_dtype}."
+                    "Invalid `dtype` passed to `GRPOConfig`. Expected either 'auto' or a string representing "
+                    f"a `torch.dtype` (e.g., 'float32'), but got {dtype}."
                 )
 
             # Disable caching if gradient checkpointing is enabled (not supported)

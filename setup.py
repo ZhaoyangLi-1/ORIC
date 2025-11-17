@@ -53,18 +53,31 @@ _deps = [
     "isort>=5.12.0",
     "liger_kernel==0.5.2",
     "lighteval @ git+https://github.com/huggingface/lighteval.git@4f381b352c0e467b5870a97d41cb66b487a2c503#egg=lighteval[math]",
-    "math-verify",  # Used for math verification in grpo
+    "math-verify",
     "packaging>=23.0",
     "parameterized>=0.9.0",
     "pytest",
     "safetensors>=0.3.3",
     "sentencepiece>=0.1.99",
-    "torch>=2.5.1",
+    "torch==2.5.1", 
+    "torchvision==0.20.1",
+    "torchaudio==2.5.1",                         
+    "transformers>=4.51.0,<5.0",              
+    "huggingface-hub>=0.23,<1.0",
     "trl @ git+https://github.com/huggingface/trl.git@main",
     "vllm==0.6.6.post1",
     "wandb>=0.19.1",
-    "pillow",
+    "pycocotools",
+    "shapely",
+    "numpy",
+    "tqdm",
+    "scikit-learn",
+    "openai",
+    "tensorboardx",
+    "qwen_vl_utils",
+    "psutil",
 ]
+
 
 # this is a lookup table with items like:
 #
@@ -94,14 +107,28 @@ install_requires = [
     deps["datasets"],
     deps["deepspeed"],
     deps["hf_transfer"],
-    # deps["huggingface-hub"],
     deps["liger_kernel"],
-    deps["packaging"],  # utilities from PyPA to e.g., compare versions
+    deps["packaging"],
     deps["safetensors"],
     deps["sentencepiece"],
-    # deps["transformers"],
+    deps["torch"],
+    deps["torchvision"],
+    deps["torchaudio"],
+    deps["transformers"],
+    deps["huggingface-hub"],
     deps["trl"],
+    deps["numpy"],
+    deps["tqdm"],
+    deps["pycocotools"],
+    deps["shapely"],
+    deps["scikit-learn"],
+    deps["openai"],
+    deps["wandb"],
+    deps["tensorboardx"],
+    deps["qwen_vl_utils"],
+    deps["psutil"],
 ]
+
 
 setup(
     name="open-r1",
