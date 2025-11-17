@@ -22,7 +22,7 @@ Applied to MSCOCO, ORIC produces both **ORIC-Bench** (evaluation) and **ORIC-sty
 ---
 
 
-## 1. Setup:
+## 🛠️ 1. Setup:
 ```bash
 git clone https://github.com/ZhaoyangLi-1/ORIC.git
 cd ORIC
@@ -149,10 +149,4 @@ torchrun --nproc_per_node="4" \
     --lr_scheduler_type cosine
 ```
 
-Arguments:
-
---output_dir ${SAVE_PATH}: Directory where all finetuned model weights, logs, and checkpoints will be saved.
-
---model_name_or_path ${CKPT_PATH}: Path to the pretrained base model (e.g., Qwen3-VL-8B-Instruct) used as the initialization for Visual-RFT.
-
---dataset_name ${DATA_PATH}: Path to the ORIC-style training dataset in JSON / HF Dataset format for GRPO finetuning.
+> ✅ The trainers automatically detect whether the checkpoint corresponds to Qwen2, Qwen2.5, or Qwen3-VL (including MoE variants) and select the correct model class and image processor settings.
