@@ -309,7 +309,7 @@ class ORIC:
         # All possible object names from COCO categories
         all_objs = {c["name"] for c in self.coco.dataset["categories"]}
 
-        # Track (image, object, label) triples to avoid duplicates
+        # Track (image, object, solution) triples to avoid duplicates
         seen: Set[Tuple[str, str, str]] = set()
 
         out: List[Dict] = []

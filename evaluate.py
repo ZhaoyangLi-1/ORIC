@@ -7,19 +7,14 @@ def compute_metrics(y_true, y_pred):
     report = classification_report(
         y_true,
         y_pred,
-        labels=["no", "yes"],
+        solutions=["no", "yes"],
         target_names=["no", "yes"],
         zero_division=0,
         output_dict=True,
     )
-    cm = confusion_matrix(y_true, y_pred, labels=["no", "yes"])
-    tn, fp, fn, tp = cm.ravel() if cm.size == 4 else (0, 0, 0, 0)
 
     f1_yes = round(report["yes"]["f1-score"] * 100, 2)
     f1_no = round(report["no"]["f1-score"] * 100, 2)
-    balanced_f1 = round(
-        (2 * f1_yes * f1_no) / (f1_yes + f1_no) if (f1_yes + f1_no) > 0 else 0, 2
-    )
 
     metrics = {
         "yes": {
@@ -44,8 +39,8 @@ def compute_metrics(y_true, y_pred):
     return metrics
 
 
-def load_labels(data_json):
-    y_true = [d["label"] for d in data_json]
+def load_solutions(data_json):
+    y_true = [d["solution"] for d in data_json]
     y_pred = [d["predicted_answer"] for d in data_json]
     return y_true, y_pred
 
@@ -83,7 +78,7 @@ def main():
     with open(args.input_json, "r", encoding="utf-8") as f:
         data_json = json.load(f)
 
-    y_true, y_pred = load_labels(data_json)
+    y_true, y_pred = load_solutions(data_json)
     results = compute_metrics(y_true, y_pred)
 
     save_results(results, args.output_folder)

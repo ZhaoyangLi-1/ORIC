@@ -65,21 +65,77 @@ Run your Vision-Language Model (VLM) on the generated ORIC Q&A pairs. The output
 ```json
 [
   {
-    "question_id": "000001",
+    "question_id": "1",
     "predicted_answer": "yes",
-    "label": "yes"
+    "solution": "yes"
   },
   {
-    "question_id": "000002",
+    "question_id": "2",
     "predicted_answer": "no",
-    "label": "no"
+    "solution": "no"
   }
 ]
 ```
 
-## 5. Evaluate Model Performance：
+## 5. Evaluate Model Performance:
 ```bash
 python evaluate.py \
   --result_path /path/to/predictions.json \
   --output_folder /path/to/eval_results
 ```
+
+## 6. Visual-RFT Finetuning
+
+This section describes how to fine-tune **Qwen3-VL-8B-Instruct** using **Visual-RFT**, our reinforcement-learning–based finetuning pipeline built upon **Group Relative Policy Optimization (GRPO)** for binary object-existence classification on ORIC-style data.
+
+### Requirements
+- 4 × NVIDIA H100 / A100 GPUs  
+- PyTorch ≥ 2.1  
+- Flash-Attention v2  
+- DeepSpeed ZeRO-3 (config included in repo)
+
+---
+
+### 6.1 Training Command
+
+Run the following command to launch GRPO fine-tuning on 4 GPUs:
+
+```bash
+torchrun --nproc_per_node="4" \
+    --nnodes="1" \
+    --node_rank="0" \
+    --master_addr="127.0.0.1" \
+    --master_port="12345" \
+    virft/src/open_r1/grpo_classification.py \
+    --output_dir ${SAVE_PATH} \
+    --model_name_or_path ${CKPT_PATH} \
+    --dataset_name ${DATA_PATH} \
+    --deepspeed virft/zero3.json \
+    --max_prompt_length 1024 \
+    --per_device_train_batch_size 1 \
+    --gradient_accumulation_steps 4 \
+    --logging_steps 1 \
+    --bf16 true \
+    --report_to wandb \
+    --gradient_checkpointing true \
+    --attn_implementation flash_attention_2 \
+    --max_pixels 401408 \
+    --num_train_epochs 15 \
+    --run_name Qwen3-VL-8B_GRPO_oric \
+    --save_steps 100 \
+    --save_only_model true \
+    --num_generations 8 \
+    --learning_rate 2e-6 \
+    --lr_scheduler_type cosine
+```
+
+Arguments:
+
+--output_dir ${SAVE_PATH}
+Directory where all finetuned model weights, logs, and checkpoints will be saved.
+
+--model_name_or_path ${CKPT_PATH}
+Path to the pretrained base model (e.g., Qwen3-VL-8B-Instruct) used as the initialization for Visual-RFT.
+
+--dataset_name ${DATA_PATH}
+Path to the ORIC-style training dataset in JSON / HF Dataset format for GRPO finetuning.
