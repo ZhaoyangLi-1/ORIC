@@ -15,14 +15,7 @@ from pycocotools.coco import COCO
 from utils.chatbot import Chatbot, DecodingArguments
 
 
-class ORIC:
-    QUESTION_TEMPLATE = [
-        "Is there {object} in the image?",
-        "Does the image contain {object}?",
-        "Have you noticed {object} in the image?",
-        "Can you see {object} in the image?",
-    ]
-    
+class ORIC:    
     def __init__(
         self,
         coco,
@@ -41,6 +34,13 @@ class ORIC:
         self.image_folder = image_folder
         assert split in ["train", "val"], "Invalid split"
         self.split = split
+        
+        self.basic_question_template = [
+            "Is there {object} in the image?",
+            "Does the image contain {object}?",
+            "Have you noticed {object} in the image?",
+            "Can you see {object} in the image?",
+        ]
         
         self.train_question_template = (
             "{question} Please first provide your reasoning or working out"
@@ -252,7 +252,7 @@ class ORIC:
         for obj in final[:num_targets]:
             texts = [
                 t.format(object=obj if obj[0] not in "aeiouAEIOU" else f"an {obj}")
-                for t in self.QUESTION_TEMPLATE
+                for t in self.basic_question_template
             ]
             if self.split == "train":
                 texts = self.train_question_template.format(question=texts[0])
@@ -296,7 +296,7 @@ class ORIC:
             obj = candidates[i]
             texts = [
                 t.format(object=obj if obj[0] not in "aeiouAEIOU" else f"an {obj}")
-                for t in self.QUESTION_TEMPLATE
+                for t in self.basic_question_template
             ]
             if self.split == "train":
                 texts = self.train_question_template.format(question=texts[0])
@@ -393,6 +393,3 @@ class ORIC:
                 break
 
         return out
-
-
-# "similar_image": img,

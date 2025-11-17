@@ -130,8 +130,6 @@ def main(args):
         sim_pairs, num_targets=args.num_objects, max_images=args.num_images
     )
     
-    
-
     # Save final questions
     with open(questions_path, "w") as f:
         json.dump(questions, f, indent=4)
