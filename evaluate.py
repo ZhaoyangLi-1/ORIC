@@ -3,6 +3,25 @@ import json
 import argparse
 from sklearn.metrics import classification_report, confusion_matrix
 
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Evaluate binary classification results from JSON file.")
+    parser.add_argument(
+        "--result_path",
+        type=str,
+        required=True,
+        help="Path to the input JSON file containing predictions.",
+    )
+
+    parser.add_argument(
+        "--output_folder",
+        type=str,
+        default="./results",
+        help="Folder to save evaluation results.",
+    )
+    return parser.parse_args()
+
+
 def compute_metrics(y_true, y_pred):
     report = classification_report(
         y_true,
@@ -51,24 +70,6 @@ def save_results(results, output_folder):
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=4, ensure_ascii=False)
     print(f"Results saved to {json_path}")
-
-
-def parse_args():
-    parser = argparse.ArgumentParser(description="Evaluate binary classification results from JSON file.")
-    parser.add_argument(
-        "--result_path",
-        type=str,
-        required=True,
-        help="Path to the input JSON file containing predictions.",
-    )
-
-    parser.add_argument(
-        "--output_folder",
-        type=str,
-        default="./results",
-        help="Folder to save evaluation results.",
-    )
-    return parser.parse_args()
 
 
 def main():
