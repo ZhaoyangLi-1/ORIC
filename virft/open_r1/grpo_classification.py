@@ -11,14 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# This file is adapted from Visual-RFT (https://github.com/Liuziyu77/Visual-RFT)
+# with modifications for ORIC training, image-conditioned prompts, and custom reward functions
 
 import os
 import sys
-# CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-# VIRFT_DIR = os.path.dirname(CURRENT_DIR) 
-# if VIRFT_DIR not in sys.path:
-#     sys.path.insert(0, VIRFT_DIR)
-
 import re
 from datetime import datetime
 from dataclasses import dataclass, field
