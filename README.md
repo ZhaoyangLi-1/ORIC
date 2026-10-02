@@ -197,3 +197,17 @@ torchrun --nproc_per_node="4" \
 ```
 
 > ✅ The trainers automatically detect whether the checkpoint corresponds to Qwen2, Qwen2.5, or Qwen3-VL (including MoE variants) and select the correct model class and image processor settings.
+
+
+### Citation
+If you find our work useful, please consider citing our paper as follows:
+
+```
+@inproceedings{li2026oric,
+  title={Oric: Benchmarking object recognition under contextual incongruity in large vision-language models},
+  author={Li, Zhaoyang and Ling, Zhan and Zhou, Yuchen and Gong, Litian and Biyik, Erdem and Su, Hao},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  pages={23673--23684},
+  year={2026}
+}
+```
